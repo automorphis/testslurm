@@ -25,7 +25,7 @@ def _run_subprocess(args):
         return completed_subprocess.stdout
 
 def _time():
-    return datetime.datetime.now().strftime('%H:%M:%S.% f %Y-%m-%d')
+    return datetime.datetime.now().strftime('%H:%M:%S.%f %Y-%m-%d')
 
 class TestSlurm(unittest.TestCase):
 
@@ -208,10 +208,7 @@ f"""#!/usr/bin/env bash
         self.sbatch_file = resolve_path(check_return_Path_None_default(sbatch_file, 'sbatch_file', self.sbatch_file))
         self.error_file = check_return_Path_None_default(error_file, 'error_file', None)
         self.output_file = check_return_Path_None_default(output_file, 'output_file', None)
-        sbatch_process = subprocess.run(
-            ['sbatch', str(sbatch_file)], capture_output = True, text = True
-        )
-        self.job_id = sbatch_process.stdout[20:-1]
+        self.job_id = _run_subprocess(['sbatch', str(sbatch_file)])[20:-1]
 
         if verbose:
             print(f'Batch job submitted\n{_time()}\n{self.sbatch_file}\n{self.job_id}')
