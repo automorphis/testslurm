@@ -208,7 +208,7 @@ f"""#!/usr/bin/env bash
         self.sbatch_file = resolve_path(check_return_Path_None_default(sbatch_file, 'sbatch_file', self.sbatch_file))
         self.error_file = check_return_Path_None_default(error_file, 'error_file', None)
         self.output_file = check_return_Path_None_default(output_file, 'output_file', None)
-        self.job_id = _run_subprocess(['sbatch', str(sbatch_file)])[20:-1]
+        self.job_id = _run_subprocess(['sbatch', str(self.sbatch_file)])[20:-1]
 
         if verbose:
             print(f'Batch job submitted\n{_time()}\n{self.sbatch_file}\n{self.job_id}')
