@@ -97,14 +97,21 @@ class TestSlurm(unittest.TestCase):
         self.output_file = None
         self.cancel_job()
 
+    def check_job_id(self):
+
+        if self.job_id is None:
+            raise ValueError("job_id is None")
+
     def cancel_job(self, job_id = None):
 
         job_id = check_type_None_default(job_id, 'job_id', str, self.job_id)
+        self.check_job_id()
         _run_subprocess(['scancel', job_id])
 
     def job_state(self, job_id = None):
 
         job_id = check_type_None_default(job_id, 'job_id', str, self.job_id)
+        self.check_job_id()
         return _run_subprocess(['squeue', '-j', '-h', job_id, '-o', '%.2t'])
 
     def check_error_file(self, regex = None):
@@ -146,7 +153,8 @@ class TestSlurm(unittest.TestCase):
 
     def wait_till_not_state(self, state, job_id = None, max_sec = 600, query_sec = 1, verbose = False):
 
-        check_type_None_default(job_id, 'job_id', str, self.job_id)
+        job_id = check_type_None_default(job_id, 'job_id', str, self.job_id)
+        self.check_job_id()
         querying = True
         start = time.time()
         current_state = None
