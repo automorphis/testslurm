@@ -112,7 +112,7 @@ class TestSlurm(unittest.TestCase):
 
         job_id = check_type_None_default(job_id, 'job_id', str, self.job_id)
         self.check_job_id()
-        return _run_subprocess(['squeue', '-j', '-h', job_id, '-o', '%.2t'])
+        return _run_subprocess(['squeue', '-j', '-h', job_id, '-o', '%.2t']).strip()
 
     def check_error_file(self, regex = None):
 
