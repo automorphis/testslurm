@@ -172,7 +172,7 @@ class TestSlurm(unittest.TestCase):
         tasks = check_return_int(tasks, 'tasks')
         time_sec = check_return_int(time_sec, 'time_sec')
         self.error_file = check_return_Path(error_file, 'error_file')
-        self.output_file = check_return_Path(output_file, 'output_file')
+        self.output_file = check_return_Path_None_default(output_file, 'output_file', None)
         contents = (
 f"""#!/usr/bin/env bash
 
