@@ -92,10 +92,10 @@ class TestSlurm(unittest.TestCase):
 
     def tearDown(self):
 
+        self.cancel_job()
         self.job_id = None
         self.error_file = None
         self.output_file = None
-        self.cancel_job()
 
     def check_job_id(self):
 
