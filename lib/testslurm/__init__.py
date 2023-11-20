@@ -203,11 +203,9 @@ f"""#!/usr/bin/env bash
         if verbose:
             print(f'Wrote batch file\n{_time()}\n{self.sbatch_file}\n{contents}')
 
-    def submit_batch(self, sbatch_file = None, error_file = None, output_file = None, verbose = False):
+    def submit_batch(self, sbatch_file = None, verbose = False):
 
         self.sbatch_file = resolve_path(check_return_Path_None_default(sbatch_file, 'sbatch_file', self.sbatch_file))
-        self.error_file = check_return_Path_None_default(error_file, 'error_file', None)
-        self.output_file = check_return_Path_None_default(output_file, 'output_file', None)
         self.job_id = _run_subprocess(['sbatch', str(self.sbatch_file)])[20:-1]
 
         if verbose:
