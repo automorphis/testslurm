@@ -5,13 +5,15 @@ import shutil
 import subprocess
 import time
 import unittest
+from enum import Enum
 from pathlib import Path
 
 from ._utilities import check_type, check_return_Path_None_default, resolve_path, random_unique_filename, \
     check_type_None_default, check_return_Path, check_return_int
 
 __all__ = [
-    'TestSlurm'
+    'TestSlurm',
+    'SlurmStates'
 ]
 
 def _run_subprocess(args):
@@ -27,9 +29,8 @@ def _run_subprocess(args):
 def _time():
     return datetime.datetime.now().strftime('%H:%M:%S.%f %Y-%m-%d')
 
-class TestSlurm(unittest.TestCase):
+class SlurmStates(Enum):
 
-    test_dir = None
     BOOT_FAIL     = 'BF'
     CANCELLED     = 'CA'
     COMPLETED     = 'CD'
@@ -54,6 +55,11 @@ class TestSlurm(unittest.TestCase):
     STOPPED       = 'ST'
     SUSPENDED     = 'S'
     TIMEOUT       = 'TO'
+    NONE          = ''
+
+class TestSlurm(unittest.TestCase):
+
+    test_dir = None
 
     def __init_subclass__(cls, **kwargs):
 
@@ -97,22 +103,28 @@ class TestSlurm(unittest.TestCase):
         self.error_file = None
         self.output_file = None
 
-    def check_job_id(self):
+    def check_job_id(self, job_id):
 
-        if self.job_id is None:
+        check_type_None_default(job_id, 'job_id', str, None)
+
+        if job_id is None and self.job_id is None:
             raise ValueError("job_id is None")
+
+        elif job_id is not None:
+            return job_id
+
+        else:
+            return self.job_id
 
     def cancel_job(self, job_id = None):
 
-        job_id = check_type_None_default(job_id, 'job_id', str, self.job_id)
-        self.check_job_id()
+        job_id = self.check_job_id(job_id)
         _run_subprocess(['scancel', job_id])
 
     def job_state(self, job_id = None):
 
-        job_id = check_type_None_default(job_id, 'job_id', str, self.job_id)
-        self.check_job_id()
-        return _run_subprocess(['squeue', '-j', '-h', job_id, '-o', '%.2t']).strip()
+        job_id = self.check_job_id(job_id)
+        return SlurmStates(_run_subprocess(['squeue', '-j', '-h', job_id, '-o', '%.2t']).strip())
 
     def check_error_file(self, regex = None):
 
@@ -153,8 +165,11 @@ class TestSlurm(unittest.TestCase):
 
     def wait_till_not_state(self, state, job_id = None, max_sec = 600, query_sec = 1, verbose = False):
 
-        job_id = check_type_None_default(job_id, 'job_id', str, self.job_id)
-        self.check_job_id()
+        check_type(state, 'state', SlurmStates)
+        job_id = self.check_job_id(job_id)
+        max_sec = check_return_int(max_sec, 'max_sec')
+        query_sec = check_return_int(query_sec, 'query_sec')
+        check_type(verbose, 'verbose', bool)
         querying = True
         start = time.time()
         current_state = None
