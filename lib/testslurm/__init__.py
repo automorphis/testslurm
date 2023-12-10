@@ -186,7 +186,7 @@ class TestSlurm(unittest.TestCase):
         if verbose:
             print(f'Job {job_id} not in state {state} (current state = {current_state})\n{_time()}')
 
-    def write_batch(self, sbatch_file, command, name, nodes, tasks, time_sec, error_file, output_file, verbose = False):
+    def write_batch(self, sbatch_file, command, name, nodes, tasks, time_sec, error_file, output_file, additional = None, verbose = False):
 
         self.sbatch_file = check_return_Path(sbatch_file, 'sbatch_file')
         check_type(command, 'command', str)
@@ -196,6 +196,8 @@ class TestSlurm(unittest.TestCase):
         time_sec = check_return_int(time_sec, 'time_sec')
         self.error_file = check_return_Path(error_file, 'error_file')
         self.output_file = check_return_Path_None_default(output_file, 'output_file', None)
+        additional = check_type_None_default(additional, 'additional', list, [])
+        check_type(verbose, 'verbose', bool)
         contents = (
 f"""#!/usr/bin/env bash
 
@@ -204,13 +206,19 @@ f"""#!/usr/bin/env bash
 #SBATCH --ntasks={tasks}
 #SBATCH --nodes={nodes}
 #SBATCH --ntasks-per-core=1
-{f'#SBATCH --output={self.output_file}' if self.output_file is not None else ''}
-#SBATCH --error={self.error_file}
 #SBATCH --exclude=u120
+#SBATCH --error={self.error_file}"""
+        )
 
-{command}
-"""
-            )
+        if self.output_file is not None:
+            contents += f'\n#SBATCH --output={self.output_file}'
+
+        if additional is not None:
+
+            for option, value in additional:
+                contents += f'\n{option}={value}'
+
+        contents += f'\n{command}'
 
         with sbatch_file.open('w') as fh:
             fh.write(contents)
