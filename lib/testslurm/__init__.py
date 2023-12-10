@@ -153,7 +153,7 @@ class TestSlurm(unittest.TestCase):
                 self.assertIsNotNone(re.search(regex, contents))
 
             except AssertionError as e:
-                raise AssertionError(contents) from e
+                raise AssertionError(contents) from None
 
         else:
 
@@ -161,7 +161,7 @@ class TestSlurm(unittest.TestCase):
                 self.assertEqual(contents, '')
 
             except AssertionError as e:
-                raise AssertionError(contents) from e
+                raise AssertionError(contents) from None
 
     def wait_till_not_state(self, state, job_id = None, max_sec = 600, query_sec = 1, verbose = False):
 
