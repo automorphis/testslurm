@@ -216,7 +216,7 @@ f"""#!/usr/bin/env bash
         if additional is not None:
 
             for option, value in additional:
-                contents += f'\n{option}={value}'
+                contents += f'\n#SBATCH {option}={value}'
 
         contents += f'\n{command}'
 
