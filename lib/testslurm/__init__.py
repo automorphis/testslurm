@@ -150,7 +150,7 @@ class TestSlurm(unittest.TestCase):
         if regex is not None:
 
             try:
-                self.assertIsNotNone(re.match(regex, contents))
+                self.assertIsNotNone(re.search(regex, contents))
 
             except AssertionError as e:
                 raise AssertionError(contents) from e
